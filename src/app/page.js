@@ -1,51 +1,65 @@
 import Image from "next/image";
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import CssBaseline from '@mui/material/CssBaseline';
+import Grid from '@mui/material/Grid2';
+import Stack from '@mui/material/Stack';
+import Step from '@mui/material/Step';
+import StepLabel from '@mui/material/StepLabel';
+import Stepper from '@mui/material/Stepper';
+import Typography from '@mui/material/Typography';
+import theme from './theme';
+import {AppBar, CircularProgress, Container, Icon, IconButton, Paper, Toolbar} from "@mui/material";
+import { DataGrid } from '@mui/x-data-grid';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import useSWR from 'swr';
 
+const fetcher = url => fetch(url).then(r => r.json())
 
+function inventoryTable() {
+    let userId = 1; // TODO: TEMPORARY
+    const { data, error, isLoading } = useSWR(`/api/pantry/${userId}`, fetcher)
+    if (error) return (
+    <ErrorOutlineIcon />
+    )
+    if (isLoading) return (
+        <CircularProgress />
+    )
+    const paginationModel = { page: 0, pageSize: 15 };
+
+    return (
+        <DataGrid
+            rows={rows}
+            columns={columns}
+            initialState={{ pagination: { paginationModel } }}
+            pageSizeOptions={[10, 15, 20]}
+            autoPageSize={true}
+            checkboxSelection
+            sx={{ border: 2 }}
+        />
+    )
+}
 
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
+      <theme>
+        <CssBaseline enableColorScheme/>
+          <Box sx={{ flexGrow: 1 }}>
+              <AppBar position="static">
+                  <Toolbar>
+                      <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                          Kitchen Inventory Manager
+                      </Typography>
+                      <Button color="inherit">Login</Button>
+                  </Toolbar>
+              </AppBar>
+          </Box>
+          <Paper sx={{ height: 400, width: '100%' }}>
+              {inventoryTable()}
+          </Paper>
+      </theme>
 
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-        Hi
-
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Leave icon"
-            width={16}
-            height={16}
-          />
-          Log Out
-        </a>
-
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://github.com/cs4241-c25/a4-cannotilever"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/github-mark-white.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          View Source
-        </a>
-      </footer>
-    </div>
   );
 }
