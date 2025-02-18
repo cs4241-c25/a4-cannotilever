@@ -1,17 +1,24 @@
 'use client'
-import Image from "next/image";
 import Box from '@mui/material/Box';
+import * as React from 'react';
 import Button from '@mui/material/Button';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
+import EditIcon from '@mui/icons-material/Edit';
 import CssBaseline from '@mui/material/CssBaseline';
-import Grid from '@mui/material/Grid2';
-import Stack from '@mui/material/Stack';
-import Step from '@mui/material/Step';
-import StepLabel from '@mui/material/StepLabel';
-import Stepper from '@mui/material/Stepper';
+import {
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    Grid2,
+    MenuItem,
+    TextField
+} from "@mui/material";
+import Fab from '@mui/material/Fab';
+import AddIcon from '@mui/icons-material/Add';
 import Typography from '@mui/material/Typography';
 import theme from './theme';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import {AppBar, CircularProgress, Container, Icon, IconButton, Paper, Toolbar} from "@mui/material";
 import { DataGrid } from '@mui/x-data-grid';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
@@ -23,10 +30,14 @@ function inventoryTable() {
     let userId = '65d1f9c6e1d3a3b4c2d9a001'; // TODO: TEMPORARY
     const { data, error, isLoading } = useSWR(`/api/pantry/${userId}/view`, fetcher)
     if (error) return (
-        <ErrorOutlineIcon />
+        <Box justifyContent={'center'} alignItems={'center'}>
+            <ErrorOutlineIcon />
+        </Box>
     )
     if (isLoading) return (
-        <CircularProgress />
+        <Box justifyContent={'center'} alignItems={'center'}>
+            <CircularProgress />
+        </Box>
     )
     const paginationModel = { page: 0, pageSize: 15 };
     const columns = [
@@ -48,6 +59,27 @@ function inventoryTable() {
             flex: 1,
             type: 'boolean',
         },
+        {
+            field: "actions",
+            headerName: "Actions",
+            sortable: false,
+            minWidth: 70,
+            flex: 1,
+            renderCell: (params) => (
+                <Grid2 container spacing={2} alignItems={'center'} justifyContent={'center'}>
+                    <Grid2 size='auto'>
+                        <button onClick={() => handleEdit(params.row)}>
+                            <EditIcon />
+                        </button>
+                    </Grid2>
+                    <Grid2 size='auto'>
+                        <button onClick={() => handleDelete(params.row)}>
+                            <DeleteOutlinedIcon />
+                        </button>
+                    </Grid2>
+                </Grid2>
+            ),
+        }
     ];
     const rows = data.map((item) => ({
         id: item._id,
@@ -61,17 +93,31 @@ function inventoryTable() {
             rows={rows}
             columns={columns}
             density={'comfortable'}
-            autosizeOnMount={true}
+            // autosizeOnMount={true}
             initialState={{ pagination: { paginationModel } }}
             pageSizeOptions={[10, 15, 20]}
             autoPageSize={true}
-            checkboxSelection
-            // sx={{ border: 2 }}
         />
     )
 }
 
+function handleEdit(row) {
+    console.log("Edit row:", row)
+}
+function handleDelete(row) {
+    console.log("Edit row:", row)
+}
+
+
 export default function Home() {
+    const [open, setOpen] = React.useState(false);
+    const handleClickOpen = () => {
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
   return (
       <theme>
         <CssBaseline enableColorScheme/>
@@ -85,11 +131,91 @@ export default function Home() {
                   </Toolbar>
               </AppBar>
           </Box>
+
           <Box justifyContent={'center'} alignItems={'center'} sx={{ display: 'flex', flexDirection: 'column', marginTop: 10 }}>
               <Paper elevation={2} sx={{ width: '85%' }}>
                   {inventoryTable()}
               </Paper>
           </Box>
+            <Box justifyContent={'center'} alignItems={'center'} sx={{ display: 'flex', flexDirection: 'column', marginTop: 10 }}>
+                <Fab size="large" color="primary" aria-label="add" sx={{ position: 'fixed', bottom: 10, right: 10 }} onClick={handleClickOpen}>
+                    <AddIcon />
+                </Fab>
+            </Box>
+          <Dialog
+              open={open}
+              onClose={handleClose}
+              slotProps={{
+                  paper: {
+                      component: 'form',
+                      onSubmit: (event) => {
+                          event.preventDefault();
+                          const formData = new FormData(event.currentTarget);
+                          const formJson = Object.fromEntries(formData.entries());
+                          console.log(formJson);
+                          // POST to api endpoint
+
+                          handleClose();
+                      },
+                  },
+              }}
+          >
+              <DialogTitle>Add New Item</DialogTitle>
+              <DialogContent>
+                  <DialogContentText>
+                      Input the information for your new pantry item.
+                  </DialogContentText>
+                  <Box marginBottom={2}>
+                  <TextField
+                      autoFocus
+                      required
+                      margin="cozy"
+                      id="name"
+                      name="itemname"
+                      label="Item Name"
+                      type="text"
+                      fullWidth
+                      variant="standard"
+                  />
+                  </Box>
+                  <Box marginBottom={2}>
+                  <TextField
+                      required
+                      margin="cozy"
+                        id="category"
+                        name="category"
+                        label="Category"
+                        select
+                        fullWidth
+                      >
+                      <MenuItem value="Fruit">Fruit</MenuItem>
+                      <MenuItem value="Vegetable">Vegetable</MenuItem>
+                      <MenuItem value="Meat">Meat</MenuItem>
+                      <MenuItem value="Dairy">Dairy</MenuItem>
+                      <MenuItem value="Grain">Grain</MenuItem>
+                      <MenuItem value="Other">Other</MenuItem>
+                  </TextField>
+                  </Box>
+                  <Box marginBottom={2}>
+                    <TextField
+                        required
+                        margin="cozy"
+                        id="purchase_date"
+                        name="purchase_date"
+                        label="Purchase Date"
+                        type="date"
+                        fullWidth
+                        variant="standard"
+                        slotProps={{ inputLabel: { shrink: true } }}
+                    />
+                  </Box>
+
+              </DialogContent>
+              <DialogActions>
+                  <Button onClick={handleClose}>Cancel</Button>
+                  <Button type="submit">Submit</Button>
+              </DialogActions>
+          </Dialog>
 
       </theme>
 
