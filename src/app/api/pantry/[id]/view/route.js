@@ -33,7 +33,7 @@ async function foodIsOK(entries) {
                 }
                 break;
             case "Dairy":
-                if (diff > 7) {
+                if (diff > 12) {
                     entry.safe = false;
                 } else {
                     entry.safe = true;
@@ -57,6 +57,7 @@ async function foodIsOK(entries) {
                 entry.safe = false;
         }
     }
+    console.log("Entries:", entries)
     return entries;
 }
 
@@ -67,7 +68,7 @@ export async function GET(req, { params })  {
         const client = await clientPromise;
 
         const db = client.db("Pantry");
-        const userId = params.id
+        const userId = (await params).id
         console.log(userId)
 
         const items = await db
@@ -75,7 +76,7 @@ export async function GET(req, { params })  {
             .find({ user_id: new ObjectId(userId) })
             .toArray();
 
-        return NextResponse.json(foodIsOK(items));
+        return NextResponse.json(await foodIsOK(items));
 
     } catch (e) {
 

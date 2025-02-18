@@ -1,3 +1,4 @@
+'use client'
 import Image from "next/image";
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -15,7 +16,6 @@ import {AppBar, CircularProgress, Container, Icon, IconButton, Paper, Toolbar} f
 import { DataGrid } from '@mui/x-data-grid';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import useSWR from 'swr';
-import dayjs from "dayjs";
 
 const fetcher = url => fetch(url).then(r => r.json())
 
@@ -30,22 +30,22 @@ function inventoryTable() {
     )
     const paginationModel = { page: 0, pageSize: 15 };
     const columns = [
-        { field: 'name', headerName: 'Item Name', width: 130 },
-        { field: 'category', headerName: 'Category', width: 80 },
+        { field: 'name', headerName: 'Item Name', minWidth: 120, flex: 1 },
+        { field: 'category', headerName: 'Category', minWidth: 100, flex: 1},
         {
             field: 'purchase_date',
             headerName: 'Date Purchased',
             type: 'date',
-            width: 90,
-            valueGetter: (params) => params.value ? new Date(params.value) : null, // Convert to Date
-            valueFormatter: (params) =>
-                params.value ? dayjs(params.value).format("YYYY-MM-DD HH:mm") : "", // Format it
+            minWidth: 90,
+            flex: 1,
+            valueGetter: (value) => new Date(value), // Convert to Date
         },
         {
             field: 'isSafe',
             headerName: 'Safe to use',
             description: 'This column presents weather the item is safe to use or not based on category and purchase date',
-            width: 70,
+            minWidth: 70,
+            flex: 1,
             type: 'boolean',
         },
     ];
@@ -60,11 +60,13 @@ function inventoryTable() {
         <DataGrid
             rows={rows}
             columns={columns}
+            density={'comfortable'}
+            autosizeOnMount={true}
             initialState={{ pagination: { paginationModel } }}
             pageSizeOptions={[10, 15, 20]}
             autoPageSize={true}
             checkboxSelection
-            sx={{ border: 2 }}
+            // sx={{ border: 2 }}
         />
     )
 }
@@ -83,9 +85,12 @@ export default function Home() {
                   </Toolbar>
               </AppBar>
           </Box>
-          <Paper sx={{ height: 400, width: '100%' }}>
-              {inventoryTable()}
-          </Paper>
+          <Box justifyContent={'center'} alignItems={'center'} sx={{ display: 'flex', flexDirection: 'column', marginTop: 10 }}>
+              <Paper elevation={2} sx={{ width: '85%' }}>
+                  {inventoryTable()}
+              </Paper>
+          </Box>
+
       </theme>
 
   );
