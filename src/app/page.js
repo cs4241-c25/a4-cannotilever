@@ -15,20 +15,47 @@ import {AppBar, CircularProgress, Container, Icon, IconButton, Paper, Toolbar} f
 import { DataGrid } from '@mui/x-data-grid';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import useSWR from 'swr';
+import dayjs from "dayjs";
 
 const fetcher = url => fetch(url).then(r => r.json())
 
 function inventoryTable() {
-    let userId = 1; // TODO: TEMPORARY
-    const { data, error, isLoading } = useSWR(`/api/pantry/${userId}`, fetcher)
+    let userId = '65d1f9c6e1d3a3b4c2d9a001'; // TODO: TEMPORARY
+    const { data, error, isLoading } = useSWR(`/api/pantry/${userId}/view`, fetcher)
     if (error) return (
-    <ErrorOutlineIcon />
+        <ErrorOutlineIcon />
     )
     if (isLoading) return (
         <CircularProgress />
     )
     const paginationModel = { page: 0, pageSize: 15 };
-
+    const columns = [
+        { field: 'name', headerName: 'Item Name', width: 130 },
+        { field: 'category', headerName: 'Category', width: 80 },
+        {
+            field: 'purchase_date',
+            headerName: 'Date Purchased',
+            type: 'date',
+            width: 90,
+            valueGetter: (params) => params.value ? new Date(params.value) : null, // Convert to Date
+            valueFormatter: (params) =>
+                params.value ? dayjs(params.value).format("YYYY-MM-DD HH:mm") : "", // Format it
+        },
+        {
+            field: 'isSafe',
+            headerName: 'Safe to use',
+            description: 'This column presents weather the item is safe to use or not based on category and purchase date',
+            width: 70,
+            type: 'boolean',
+        },
+    ];
+    const rows = data.map((item) => ({
+        id: item._id,
+        name: item.name,
+        category: item.category,
+        purchase_date: item.purchase_date,
+        isSafe: item.safe,
+    }));
     return (
         <DataGrid
             rows={rows}
