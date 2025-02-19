@@ -1,6 +1,6 @@
 'use server'
 
-import clientPromise from "@/lib/mongo";
+import clientPromise from "../../../../../lib/mongo";
 import {ObjectId} from "mongodb";
 import {NextResponse} from "next/server";
 

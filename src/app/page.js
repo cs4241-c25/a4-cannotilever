@@ -28,10 +28,8 @@ import { DataGrid } from '@mui/x-data-grid';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import useSWR from 'swr';
 import { mutate } from 'swr';
-import { signIn, signOut, useSession } from "next-auth/react";
-
 import { ThemeProvider } from "@mui/material/styles";
-
+import { signIn } from "next-auth/react"
 const fetcher = url => fetch(url).then(r => r.json());
 const userId = '65d1f9c6e1d3a3b4c2d9a001'; // TODO: TEMPORARY
 
@@ -124,7 +122,6 @@ async function handleDelete(row) {
 }
 
 export  default function Home() {
-    const { data: session } = useSession();
     const [open, setOpen] = useState(false);
     const [formData, setFormData] = useState({});
 
@@ -156,15 +153,7 @@ export  default function Home() {
                         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                             Kitchen Inventory Manager
                         </Typography>
-                        {session ? (
-                            <>
-                                <p>Signed in as {session.user.name}</p>
-                                <button onClick={() => signOut()}>Sign out</button>
-                            </>
-                        ) : (
-                            <button onClick={() => signIn("github")}>Sign in with GitHub</button>
-                        )}
-                        <Button color="inherit">Login</Button>
+                        <Button color="inherit" onClick={() => signIn("github")}>Login</Button>
                     </Toolbar>
                 </AppBar>
             </Box>
