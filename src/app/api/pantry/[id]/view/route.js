@@ -57,7 +57,6 @@ async function foodIsOK(entries) {
                 entry.safe = false;
         }
     }
-    console.log("Entries:", entries)
     return entries;
 }
 
@@ -69,7 +68,6 @@ export async function GET(req, { params })  {
 
         const db = client.db("Pantry");
         const userId = (await params).id
-        console.log(userId)
 
         const items = await db
             .collection("items")

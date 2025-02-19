@@ -5,6 +5,7 @@ import Button from '@mui/material/Button';
 import EditIcon from '@mui/icons-material/Edit';
 import CssBaseline from '@mui/material/CssBaseline';
 import {
+    Alert,
     Dialog,
     DialogActions,
     DialogContent,
@@ -23,11 +24,14 @@ import {AppBar, CircularProgress, Container, Icon, IconButton, Paper, Toolbar} f
 import { DataGrid } from '@mui/x-data-grid';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import useSWR from 'swr';
+import {ThemeProvider} from "@mui/material/styles";
 
 const fetcher = url => fetch(url).then(r => r.json())
 
+const userId = '65d1f9c6e1d3a3b4c2d9a001'; // TODO: TEMPORARY
+
+
 function inventoryTable() {
-    let userId = '65d1f9c6e1d3a3b4c2d9a001'; // TODO: TEMPORARY
     const { data, error, isLoading } = useSWR(`/api/pantry/${userId}/view`, fetcher)
     if (error) return (
         <Box justifyContent={'center'} alignItems={'center'}>
@@ -96,7 +100,7 @@ function inventoryTable() {
             // autosizeOnMount={true}
             initialState={{ pagination: { paginationModel } }}
             pageSizeOptions={[10, 15, 20]}
-            autoPageSize={true}
+
         />
     )
 }
@@ -119,7 +123,7 @@ export default function Home() {
         setOpen(false);
     };
   return (
-      <theme>
+      <ThemeProvider theme={theme}>
         <CssBaseline enableColorScheme/>
           <Box sx={{ flexGrow: 1 }}>
               <AppBar position="static">
@@ -154,7 +158,16 @@ export default function Home() {
                           const formJson = Object.fromEntries(formData.entries());
                           console.log(formJson);
                           // POST to api endpoint
-
+                          const response = fetch(`/api/pantry/${userId}/add`, {
+                              method: 'POST',
+                              headers: {
+                                  'Content-Type': 'application/json'
+                              },
+                              body: JSON.stringify(formJson)
+                          });
+                          if (response.ok) {
+                              console.log("Item added successfully");
+                          }
                           handleClose();
                       },
                   },
@@ -217,7 +230,7 @@ export default function Home() {
               </DialogActions>
           </Dialog>
 
-      </theme>
+      </ThemeProvider>
 
   );
 }
