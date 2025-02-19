@@ -29,7 +29,9 @@ import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import useSWR from 'swr';
 import { mutate } from 'swr';
 import { ThemeProvider } from "@mui/material/styles";
-import { signIn } from "next-auth/react"
+import {signIn, signOut} from "next-auth/react"
+import { useSession } from "next-auth/react"
+
 const fetcher = url => fetch(url).then(r => r.json());
 const userId = '65d1f9c6e1d3a3b4c2d9a001'; // TODO: TEMPORARY
 
@@ -122,6 +124,7 @@ async function handleDelete(row) {
 }
 
 export  default function Home() {
+    const { data: session } = useSession()
     const [open, setOpen] = useState(false);
     const [formData, setFormData] = useState({});
 
@@ -154,6 +157,7 @@ export  default function Home() {
                             Kitchen Inventory Manager
                         </Typography>
                         <Button color="inherit" onClick={() => signIn("github")}>Login</Button>
+                        <Button color="inherit" onClick={() => signOut()}>Sign Out</Button>
                     </Toolbar>
                 </AppBar>
             </Box>
