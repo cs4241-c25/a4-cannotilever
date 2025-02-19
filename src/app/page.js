@@ -5,7 +5,8 @@ import Button from '@mui/material/Button';
 import EditIcon from '@mui/icons-material/Edit';
 import CssBaseline from '@mui/material/CssBaseline';
 import {
-    Alert,
+    AppBar,
+    CircularProgress,
     Dialog,
     DialogActions,
     DialogContent,
@@ -13,15 +14,16 @@ import {
     DialogTitle,
     Grid2,
     MenuItem,
-    TextField
+    Paper,
+    TextField,
+    Toolbar
 } from "@mui/material";
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
 import Typography from '@mui/material/Typography';
 import theme from './theme';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
-import {AppBar, CircularProgress, Container, Icon, IconButton, Paper, Toolbar} from "@mui/material";
-import { DataGrid } from '@mui/x-data-grid';
+import {DataGrid} from '@mui/x-data-grid';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import useSWR from 'swr';
 import {ThemeProvider} from "@mui/material/styles";
@@ -100,7 +102,7 @@ function inventoryTable() {
             // autosizeOnMount={true}
             initialState={{ pagination: { paginationModel } }}
             pageSizeOptions={[10, 15, 20]}
-
+            disableRowSelectionOnClick
         />
     )
 }
@@ -108,8 +110,15 @@ function inventoryTable() {
 function handleEdit(row) {
     console.log("Edit row:", row)
 }
-function handleDelete(row) {
-    console.log("Edit row:", row)
+async function handleDelete(row) {
+    console.log("Delete row:", row)
+    const response = fetch(`/api/pantry/${userId}/delete`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id: row.id })
+    });
 }
 
 
